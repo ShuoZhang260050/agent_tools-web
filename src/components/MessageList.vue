@@ -40,7 +40,8 @@ defineExpose({ scrollBottom })
 
       <!-- Tool card -->
       <ToolCard
-        v-else-if="item.type === 'tool_card' && !item.hidden'"
+        v-else-if="item.type === 'tool_card'"
+        v-show="!item.hidden"
         :tool-call="item.toolCall"
         :status="item.status"
         :result="item.result"

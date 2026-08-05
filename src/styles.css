@@ -203,7 +203,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .auth-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; margin-bottom: 8px; box-sizing: border-box; }
 .auth-submit { width: 100%; padding: 10px; background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; }
 .auth-error { color: #e53e3e; font-size: 13px; margin-top: 8px; display: none; }
-`n/* scrollbar */`n.messages::-webkit-scrollbar, .session-list::-webkit-scrollbar, .sync-files::-webkit-scrollbar, .ws-browse-list::-webkit-scrollbar, .trace-panel::-webkit-scrollbar { width: 6px; }`n.messages::-webkit-scrollbar-track, .session-list::-webkit-scrollbar-track { background: transparent; }`n.messages::-webkit-scrollbar-thumb, .session-list::-webkit-scrollbar-thumb, .sync-files::-webkit-scrollbar-thumb, .ws-browse-list::-webkit-scrollbar-thumb, .trace-panel::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }`n.messages::-webkit-scrollbar-thumb:hover { background: #9ca3af; }`n.header { box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 5; }
+
+/* scrollbar */
+.messages::-webkit-scrollbar, .session-list::-webkit-scrollbar, .sync-files::-webkit-scrollbar, .ws-browse-list::-webkit-scrollbar, .trace-panel::-webkit-scrollbar { width: 6px; }
+.messages::-webkit-scrollbar-track, .session-list::-webkit-scrollbar-track { background: transparent; }
+.messages::-webkit-scrollbar-thumb, .session-list::-webkit-scrollbar-thumb, .sync-files::-webkit-scrollbar-thumb, .ws-browse-list::-webkit-scrollbar-thumb, .trace-panel::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+.messages::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+.header { box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 5; }
 
 /* scrollbar */
 .messages::-webkit-scrollbar, .session-list::-webkit-scrollbar, .sync-files::-webkit-scrollbar, .ws-browse-list::-webkit-scrollbar, .trace-panel::-webkit-scrollbar { width: 6px; }
