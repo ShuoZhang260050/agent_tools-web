@@ -1,13 +1,18 @@
 ﻿<script setup>
-import { ref } from "vue"
+import { ref, computed, onMounted, onUnmounted } from "vue"
 import { api } from "../api.js"
+import { modelShortName } from "../utils.js"
+import { PERMISSION_CHOICES } from "../store.js"
 
 const props = defineProps({
   sending: { type: Boolean, default: false },
   approvalPending: { type: Boolean, default: false },
   syncPending: { type: Boolean, default: false },
+  availableModels: { type: Array, default: () => [] },
+  currentModel: { type: String, default: "" },
+  currentPermission: { type: String, default: "request_approval" },
 })
-const emit = defineEmits(["send", "abort", "upload-rag"])
+const emit = defineEmits(["send", "abort", "upload-rag", "select-model", "select-permission"])
 
 const inputText = ref("")
 const currentImage = ref(null)
@@ -15,21 +20,22 @@ const currentFileName = ref(null)
 const currentFileText = ref(null)
 const currentFileSize = ref(null)
 const attachmentOpen = ref(false)
+const modelOpen = ref(false)
+const permOpen = ref(false)
 const imageInput = ref(null)
 const fileInput = ref(null)
 const ragInput = ref(null)
 
 const sendDisabled = computed(() => props.approvalPending || props.syncPending)
-
-import { computed } from "vue"
+const currentPerm = computed(() => PERMISSION_CHOICES.find((p) => p.value === props.currentPermission) || PERMISSION_CHOICES[0])
 
 function onKeydown(e) {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doSend() }
 }
 
-function onInput() {
-  const el = inputText.value.$el || inputText.value
-  if (el && el.style) { el.style.height = "auto"; el.style.height = Math.min(el.scrollHeight, 160) + "px" }
+function onInput(e) {
+  const el = e.target
+  if (el) { el.style.height = "auto"; el.style.height = Math.min(el.scrollHeight, 160) + "px" }
 }
 
 function doSend() {
@@ -122,6 +128,12 @@ function onPaste(e) {
     }
   }
 }
+
+function toggleModel() { modelOpen.value = !modelOpen.value; permOpen.value = false; attachmentOpen.value = false }
+function togglePerm() { permOpen.value = !permOpen.value; modelOpen.value = false; attachmentOpen.value = false }
+function onDocClick() { modelOpen.value = false; permOpen.value = false; attachmentOpen.value = false }
+onMounted(() => document.addEventListener("click", onDocClick))
+onUnmounted(() => document.removeEventListener("click", onDocClick))
 </script>
 
 <template>
@@ -139,8 +151,8 @@ function onPaste(e) {
       <input ref="imageInput" type="file" style="display:none" accept="image/*" @change="onImageChange" />
       <input ref="fileInput" type="file" style="display:none" accept=".txt,.md,.markdown,.pdf,.csv,.json,.log" @change="onFileChange" />
       <input ref="ragInput" type="file" style="display:none" accept=".txt,.md,.markdown,.pdf,.doc,.docx" @change="onRagChange" />
-      <div class="attachment-picker" :class="{ open: attachmentOpen }">
-        <button class="attachment-btn" type="button" title="上传附件" @click.stop="attachmentOpen = !attachmentOpen">+</button>
+      <div class="attachment-picker" :class="{ open: attachmentOpen }" @click.stop>
+        <button class="attachment-btn" type="button" title="上传附件" @click="attachmentOpen = !attachmentOpen; modelOpen = false; permOpen = false">+</button>
         <div class="attachment-menu">
           <button class="attachment-option" type="button" @click="onAttachmentClick('image')">上传图片</button>
           <button class="attachment-option" type="button" @click="onAttachmentClick('attach')">附加文件</button>
@@ -149,6 +161,36 @@ function onPaste(e) {
       </div>
       <textarea class="msg-input" v-model="inputText" placeholder="输入消息，Enter 发送，Shift+Enter 换行"
                 rows="1" @keydown="onKeydown" @input="onInput" @paste="onPaste"></textarea>
+      <div class="permission-picker" :class="{ open: permOpen }" @click.stop>
+        <button class="permission-button" type="button" @click="togglePerm">
+          <span class="perm-dot" :style="{ background: currentPerm.color }"></span>
+          <span class="perm-label">{{ currentPerm.label }}</span>
+          <span class="perm-caret">▾</span>
+        </button>
+        <div class="permission-menu">
+          <div v-for="p in PERMISSION_CHOICES" :key="p.value" class="permission-option"
+               :class="{ active: p.value === currentPermission }" @click="permOpen = false; emit('select-permission', p.value)">
+            <span class="perm-dot" :style="{ background: p.color }"></span>
+            <div class="perm-text">
+              <div class="perm-name">{{ p.label }}</div>
+              <div class="perm-desc">{{ p.desc }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="model-picker" :class="{ open: modelOpen }" @click.stop>
+        <button class="model-button" type="button" @click="toggleModel">
+          <span class="model-short">{{ modelShortName(currentModel) }}</span>
+          <span class="caret">▾</span>
+        </button>
+        <div class="model-menu">
+          <div v-for="m in availableModels" :key="m.name" class="model-option"
+               :class="{ active: m.name === currentModel }" @click="modelOpen = false; emit('select-model', m.name)">
+            <div class="model-name">{{ m.name }}</div>
+            <div class="model-meta">{{ modelShortName(m.name) }}{{ m.vision ? ' · 支持图片' : ' · 仅文本' }}</div>
+          </div>
+        </div>
+      </div>
       <button class="send-btn" :class="{ 'stop-mode': sending }" :disabled="sendDisabled && !sending" @click="onSendClick">{{ sending ? '■' : '➤' }}</button>
     </div>
   </div>

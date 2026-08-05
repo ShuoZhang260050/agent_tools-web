@@ -178,12 +178,7 @@ onMounted(() => { checkAuth() })
           :current-tid="store.currentTid"
           :current-user="store.currentUser"
           :workspace="store.workspace"
-          :available-models="store.availableModels"
-          :current-model="store.currentModel"
-          :current-permission="store.currentPermission"
           :trace-visible="store.traceVisible"
-          @select-model="setModel"
-          @select-permission="setPermission"
           @open-workspace="wsModalOpen = true"
           @toggle-trace="store.traceVisible = !store.traceVisible"
           @logout="logout"
@@ -201,9 +196,14 @@ onMounted(() => { checkAuth() })
           :sending="store.sending"
           :approval-pending="store.approvalPending"
           :sync-pending="store.syncPending"
+          :available-models="store.availableModels"
+          :current-model="store.currentModel"
+          :current-permission="store.currentPermission"
           @send="onSend"
           @abort="onAbort"
           @upload-rag="onUploadRag"
+          @select-model="setModel"
+          @select-permission="setPermission"
         />
       </div>
     </div>
