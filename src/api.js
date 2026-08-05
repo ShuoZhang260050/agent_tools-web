@@ -1,3 +1,5 @@
+import { logout } from './store.js'
+
 const BASE = import.meta.env.VITE_API_BASE || ''
 
 export function getToken() {
@@ -21,6 +23,10 @@ async function request(path, options = {}) {
     ...options,
     headers: { ...authHeaders(), ...options.headers },
   })
+  if (resp.status === 401) {
+    logout()
+    throw new Error('登录已过期，请重新登录')
+  }
   const data = await resp.json().catch(() => ({}))
   if (!resp.ok) throw new Error(data.detail || `HTTP ${resp.status}`)
   return data
@@ -51,6 +57,10 @@ export const api = {
 
   async getModels() {
     return request('/models')
+  },
+
+  async getMe() {
+    return request('/me')
   },
 
   async getSessions() {

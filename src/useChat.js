@@ -1,6 +1,6 @@
 ﻿import { ref } from 'vue'
 import { api } from './api.js'
-import { store } from './store.js'
+import { store, logout } from './store.js'
 
 export function useChat() {
   const items = ref([])
@@ -107,7 +107,10 @@ export function useChat() {
     store.currentAbort = new AbortController()
     try {
       const resp = await api.chat(body, store.currentAbort.signal)
-      if (!resp.ok) throw new Error('HTTP ' + resp.status)
+      if (!resp.ok) {
+        if (resp.status === 401) { logout(); throw new Error('登录已过期，请重新登录') }
+        throw new Error('HTTP ' + resp.status)
+      }
       await readStream(resp, state)
     } catch (e) {
       typing.value = false
@@ -130,7 +133,10 @@ export function useChat() {
         { thread_id: store.currentTid, decision, permission: store.currentPermission },
         store.currentAbort.signal,
       )
-      if (!resp.ok) throw new Error('HTTP ' + resp.status)
+      if (!resp.ok) {
+        if (resp.status === 401) { logout(); throw new Error('登录已过期，请重新登录') }
+        throw new Error('HTTP ' + resp.status)
+      }
       await readStream(resp, state)
     } catch (e) {
       typing.value = false

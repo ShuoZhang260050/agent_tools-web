@@ -10,9 +10,9 @@ export function escapeHtml(s) {
 export function renderMarkdown(text) {
   const fallback = escapeHtml(text || '').replace(/\n/g, '<br>')
   try {
-    let html = DOMPurify.sanitize(marked.parse(text || ''))
+    let html = marked.parse(text || '')
     html = html.replace(/\/screenshots\/screenshot_[a-f0-9]+\.png/g, '<img src="$&" style="max-width:100%;border-radius:8px;margin-top:8px;" alt="截图">')
-    return html
+    return DOMPurify.sanitize(html)
   } catch (e) {
     return fallback
   }

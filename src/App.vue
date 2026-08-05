@@ -21,11 +21,22 @@ function onAuthed(token, username) {
   localStorage.setItem("agent_user", username)
   store.authToken = token
   store.currentUser = username
-  checkAuth()
+  setAuthed(true)
+  newSession()
+  loadModels()
+  loadSessions()
+  loadDocuments()
+  loadWorkspace()
 }
 
-function checkAuth() {
+async function checkAuth() {
   if (store.authToken) {
+    try {
+      await api.getMe()
+    } catch (e) {
+      logout()
+      return
+    }
     setAuthed(true)
     store.currentUser = localStorage.getItem("agent_user") || ""
     newSession()
@@ -67,7 +78,7 @@ async function loadWorkspace() {
   try {
     const data = await api.getWorkspace()
     store.workspace = data.workspace || ""
-  } catch (e) {}
+  } catch (e) { console.error("Failed to load workspace:", e) }
 }
 
 function newSession() {
