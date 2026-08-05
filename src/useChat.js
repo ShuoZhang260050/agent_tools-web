@@ -74,6 +74,7 @@ export function useChat() {
         store.sending = false
       }
       if (state.assistantIdx === null) addMessage('assistant', '\uff08\u65e0\u5185\u5bb9\u8fd4\u56de\uff09')
+      Object.values(state.toolCardIdxs).forEach((idx) => { items.value[idx].hidden = true })
     }
   }
 
