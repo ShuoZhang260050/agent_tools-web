@@ -167,20 +167,20 @@ onMounted(() => { checkAuth() })
         :sessions="sessions"
         :documents="documents"
         :current-tid="store.currentTid"
+        :workspace="store.workspace"
+        :trace-visible="store.traceVisible"
         @new-session="newSession"
         @select-session="selectSession"
         @delete-session="deleteSession"
         @rename-session="renameSession"
         @delete-document="deleteDocument"
+        @open-workspace="wsModalOpen = true"
+        @toggle-trace="store.traceVisible = !store.traceVisible"
       />
       <div class="main">
         <ChatHeader
           :current-tid="store.currentTid"
           :current-user="store.currentUser"
-          :workspace="store.workspace"
-          :trace-visible="store.traceVisible"
-          @open-workspace="wsModalOpen = true"
-          @toggle-trace="store.traceVisible = !store.traceVisible"
           @logout="logout"
         />
         <TracePanel :visible="store.traceVisible" :thread-id="store.currentTid" />

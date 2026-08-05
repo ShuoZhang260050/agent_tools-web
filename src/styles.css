@@ -36,6 +36,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .doc-item .doc-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 .doc-item .doc-del { opacity: 0; background: none; border: none; color: #e53e3e; cursor: pointer; font-size: 12px; padding: 0 2px; flex-shrink: 0; }
 .doc-item:hover .doc-del { opacity: 0.7; }
+.sidebar-footer { border-top: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.sidebar-footer .ws-btn { flex: 1; min-width: 0; }
+.sidebar-footer .trace-btn { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border); background: var(--panel); color: var(--muted); border-radius: 6px; cursor: pointer; flex-shrink: 0; }
+.sidebar-footer .trace-btn.active { color: var(--accent); border-color: var(--accent); }
 .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .header { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--panel); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 5; }
 .model-picker, .permission-picker { position: relative; flex-shrink: 0; }

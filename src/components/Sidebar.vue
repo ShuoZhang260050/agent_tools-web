@@ -5,8 +5,10 @@ const props = defineProps({
   sessions: { type: Array, default: () => [] },
   documents: { type: Array, default: () => [] },
   currentTid: { type: String, default: null },
+  workspace: { type: String, default: "" },
+  traceVisible: { type: Boolean, default: false },
 })
-const emit = defineEmits(["new-session", "select-session", "delete-session", "rename-session", "delete-document"])
+const emit = defineEmits(["new-session", "select-session", "delete-session", "rename-session", "delete-document", "open-workspace", "toggle-trace"])
 const renamingId = ref(null)
 const renameValue = ref("")
 
@@ -46,6 +48,14 @@ function finishRename(save) {
         <span class="doc-name">{{ d.filename }}</span>
         <button class="doc-del" title="删除" @click="emit('delete-document', d.id)">✕</button>
       </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="ws-btn" @click="emit('open-workspace')" :title="workspace">
+        {{ workspace ? "📁 " + workspace.split(/[\\\/]/).pop() : "📁 工作空间" }}
+      </button>
+      <button class="trace-btn" :class="{ active: traceVisible }" @click="emit('toggle-trace')">
+        {{ traceVisible ? "🔍 调试 ON" : "🔍 调试" }}
+      </button>
     </div>
   </div>
 </template>
