@@ -6,7 +6,7 @@ import {
   fileTypeName,
   modelShortName,
   describeToolCall,
-} from './utils.js'
+} from '../src/utils.js'
 
 describe('escapeHtml', () => {
   test('escapes special characters', () => {

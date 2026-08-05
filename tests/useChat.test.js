@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest'
-import { useChat } from './useChat.js'
-import { store } from './store.js'
+import { useChat } from '../src/useChat.js'
+import { store } from '../src/store.js'
 
 describe('useChat handleEvent', () => {
   let chat
