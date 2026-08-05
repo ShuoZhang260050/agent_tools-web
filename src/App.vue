@@ -279,7 +279,12 @@ onMounted(() => {
         <ChatHeader
           :current-tid="store.currentTid"
           :current-user="store.currentUser"
+          :available-models="store.availableModels"
+          :current-model="store.currentModel"
+          :current-permission="store.currentPermission"
           @logout="logout"
+          @select-model="setModel"
+          @select-permission="setPermission"
         />
         <TracePanel
           :visible="store.traceVisible"
@@ -297,14 +302,9 @@ onMounted(() => {
           :sending="store.sending"
           :approval-pending="store.approvalPending"
           :sync-pending="store.syncPending"
-          :available-models="store.availableModels"
-          :current-model="store.currentModel"
-          :current-permission="store.currentPermission"
           @send="onSend"
           @abort="onAbort"
           @upload-rag="onUploadRag"
-          @select-model="setModel"
-          @select-permission="setPermission"
         />
       </div>
     </div>

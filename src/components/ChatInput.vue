@@ -1,49 +1,70 @@
 ﻿<script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { api } from '../api.js'
-import { modelShortName } from '../utils.js'
-import { store, PERMISSION_CHOICES } from '../store.js'
 
 const props = defineProps({
   sending: { type: Boolean, default: false },
   approvalPending: { type: Boolean, default: false },
   syncPending: { type: Boolean, default: false },
-  availableModels: { type: Array, default: () => [] },
-  currentModel: { type: String, default: '' },
-  currentPermission: { type: String, default: 'request_approval' },
 })
-const emit = defineEmits(['send', 'abort', 'upload-rag', 'select-model', 'select-permission'])
+const emit = defineEmits(['send', 'abort', 'upload-rag'])
 
 const inputText = ref('')
+const history = ref([])
+const historyIndex = ref(-1)
 const currentImage = ref(null)
 const currentFileName = ref(null)
 const currentFileText = ref(null)
 const currentFileSize = ref(null)
 const attachmentOpen = ref(false)
-const modelOpen = ref(false)
-const permOpen = ref(false)
 const imageInput = ref(null)
 const fileInput = ref(null)
 const ragInput = ref(null)
 
 const sendDisabled = computed(() => props.approvalPending || props.syncPending)
-const currentPerm = computed(
-  () => store.permissionChoices.find((p) => p.value === props.currentPermission) || PERMISSION_CHOICES[0]
-)
 
 function onKeydown(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
     doSend()
+    return
+  }
+  if (e.key === 'ArrowUp' && (e.target.selectionStart === 0 || !inputText.value)) {
+    e.preventDefault()
+    navigateHistory(-1, e.target)
+  } else if (e.key === 'ArrowDown' && (e.target.selectionStart === inputText.value.length || !inputText.value)) {
+    e.preventDefault()
+    navigateHistory(1, e.target)
   }
 }
 
-function onInput(e) {
-  const el = e.target
-  if (el) {
-    el.style.height = 'auto'
-    el.style.height = Math.min(el.scrollHeight, 160) + 'px'
+function navigateHistory(dir, el) {
+  if (history.value.length === 0) return
+  if (dir === -1) {
+    if (historyIndex.value === -1) historyIndex.value = history.value.length - 1
+    else if (historyIndex.value > 0) historyIndex.value--
+    else return
+  } else {
+    if (historyIndex.value === -1) return
+    if (historyIndex.value < history.value.length - 1) historyIndex.value++
+    else {
+      historyIndex.value = -1
+      inputText.value = ''
+      nextTick(() => resizeTextarea(el))
+      return
+    }
   }
+  inputText.value = history.value[historyIndex.value]
+  nextTick(() => resizeTextarea(el))
+}
+
+function resizeTextarea(el) {
+  el.style.height = 'auto'
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px'
+}
+
+function onInput(e) {
+  if (e.target) resizeTextarea(e.target)
 }
 
 function doSend() {
@@ -55,6 +76,10 @@ function doSend() {
     props.syncPending
   )
     return
+  if (text && text !== history.value[history.value.length - 1]) {
+    history.value.push(text)
+  }
+  historyIndex.value = -1
   const body = { message: text || '' }
   if (currentImage.value) body.image = currentImage.value
   if (currentFileText.value) {
@@ -167,32 +192,10 @@ function onPaste(e) {
   }
 }
 
-function toggleModel() {
-  modelOpen.value = !modelOpen.value
-  permOpen.value = false
-  attachmentOpen.value = false
-}
-function togglePerm() {
-  permOpen.value = !permOpen.value
-  modelOpen.value = false
-  attachmentOpen.value = false
-}
 function toggleAttachment() {
   attachmentOpen.value = !attachmentOpen.value
-  modelOpen.value = false
-  permOpen.value = false
-}
-function selectPermission(value) {
-  permOpen.value = false
-  emit('select-permission', value)
-}
-function selectModel(value) {
-  modelOpen.value = false
-  emit('select-model', value)
 }
 function onDocClick() {
-  modelOpen.value = false
-  permOpen.value = false
   attachmentOpen.value = false
 }
 onMounted(() => document.addEventListener('click', onDocClick))
@@ -300,76 +303,6 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
         @input="onInput"
         @paste="onPaste"
       />
-      <div
-        class="permission-picker"
-        :class="{ open: permOpen }"
-        @click.stop
-      >
-        <button
-          class="permission-button"
-          type="button"
-          @click="togglePerm"
-        >
-          <span
-            class="perm-dot"
-            :style="{ background: currentPerm.color }"
-          />
-          <span class="perm-label">{{ currentPerm.label }}</span>
-          <span class="perm-caret">▾</span>
-        </button>
-        <div class="permission-menu">
-          <div
-            v-for="p in store.permissionChoices"
-            :key="p.value"
-            class="permission-option"
-            :class="{ active: p.value === currentPermission }"
-            @click="selectPermission(p.value)"
-          >
-            <span
-              class="perm-dot"
-              :style="{ background: p.color }"
-            />
-            <div class="perm-text">
-              <div class="perm-name">
-                {{ p.label }}
-              </div>
-              <div class="perm-desc">
-                {{ p.desc }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        class="model-picker"
-        :class="{ open: modelOpen }"
-        @click.stop
-      >
-        <button
-          class="model-button"
-          type="button"
-          @click="toggleModel"
-        >
-          <span class="model-short">{{ modelShortName(currentModel) }}</span>
-          <span class="caret">▾</span>
-        </button>
-        <div class="model-menu">
-          <div
-            v-for="m in availableModels"
-            :key="m.name"
-            class="model-option"
-            :class="{ active: m.name === currentModel }"
-            @click="selectModel(m.name)"
-          >
-            <div class="model-name">
-              {{ m.name }}
-            </div>
-            <div class="model-meta">
-              {{ modelShortName(m.name) }}{{ m.vision ? ' · 支持图片' : ' · 仅文本' }}
-            </div>
-          </div>
-        </div>
-      </div>
       <button
         class="send-btn"
         :class="{ 'stop-mode': sending }"
