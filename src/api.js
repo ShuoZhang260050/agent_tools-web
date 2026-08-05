@@ -9,13 +9,13 @@ export function getToken() {
 export function authHeaders() {
   const t = getToken()
   return t
-    ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }
+    ? { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }
     : { 'Content-Type': 'application/json' }
 }
 
 export function authHeadersMultipart() {
   const t = getToken()
-  return t ? { 'Authorization': 'Bearer ' + t } : {}
+  return t ? { Authorization: 'Bearer ' + t } : {}
 }
 
 async function request(path, options = {}) {
@@ -138,11 +138,17 @@ export const api = {
   },
 
   async verifyShadow(tid, command) {
-    return request('/workspace/verify?thread_id=' + encodeURIComponent(tid) + '&command=' + encodeURIComponent(command), { method: 'POST' })
+    return request(
+      '/workspace/verify?thread_id=' + encodeURIComponent(tid) + '&command=' + encodeURIComponent(command),
+      { method: 'POST' }
+    )
   },
 
   async syncShadow(tid, verifyCommand) {
-    const params = 'thread_id=' + encodeURIComponent(tid) + (verifyCommand ? '&verify_command=' + encodeURIComponent(verifyCommand) : '')
+    const params =
+      'thread_id=' +
+      encodeURIComponent(tid) +
+      (verifyCommand ? '&verify_command=' + encodeURIComponent(verifyCommand) : '')
     return request('/workspace/sync?' + params, { method: 'POST' })
   },
 

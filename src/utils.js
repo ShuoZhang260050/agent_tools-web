@@ -3,17 +3,25 @@ import DOMPurify from 'dompurify'
 
 marked.use({ breaks: true, gfm: true })
 
+export const SCREENSHOT_RE = /\/screenshots\/screenshot_[a-f0-9]+\.png/g
+
 export function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))
+  return String(s).replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+  )
 }
 
 export function renderMarkdown(text) {
   const fallback = escapeHtml(text || '').replace(/\n/g, '<br>')
   try {
     let html = marked.parse(text || '')
-    html = html.replace(/\/screenshots\/screenshot_[a-f0-9]+\.png/g, '<img src="$&" style="max-width:100%;border-radius:8px;margin-top:8px;" alt="截图">')
+    html = html.replace(
+      SCREENSHOT_RE,
+      '<img src="$&" style="max-width:100%;border-radius:8px;margin-top:8px;" alt="截图">'
+    )
     return DOMPurify.sanitize(html)
-  } catch (e) {
+  } catch {
     return fallback
   }
 }
@@ -43,7 +51,10 @@ export function modelShortName(name) {
 
 export function describeToolCall(name, args) {
   args = args || {}
-  const trunc = (s, n) => { s = String(s); return s.length > n ? s.slice(0, n) + '…' : s }
+  const trunc = (s, n) => {
+    s = String(s)
+    return s.length > n ? s.slice(0, n) + '…' : s
+  }
   switch (name) {
     case 'run_command':
       return `<b>执行命令</b>：<code>${escapeHtml(trunc(args.command || '', 300))}</code>`

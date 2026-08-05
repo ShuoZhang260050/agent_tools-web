@@ -1,4 +1,4 @@
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 
 export const PERMISSION_CHOICES = [
   { value: 'request_approval', label: '请求审批', color: '#d97706', desc: '敏感操作执行前需您确认' },
@@ -55,5 +55,7 @@ let toastTimer = null
 export function showToast(message, type = 'error') {
   store.toast = { message, type, visible: true }
   if (toastTimer) clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => { store.toast.visible = false }, 4000)
+  toastTimer = setTimeout(() => {
+    store.toast.visible = false
+  }, 4000)
 }

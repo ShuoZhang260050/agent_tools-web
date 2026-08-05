@@ -52,7 +52,7 @@ async function init() {
   try {
     const data = await api.getWorkspace()
     wsBrowsePath.value = data.workspace || '.'
-  } catch (e) {
+  } catch {
     wsBrowsePath.value = '.'
   }
   await loadDrives()
@@ -63,7 +63,7 @@ watch(
   () => props.open,
   (val) => {
     if (val) init()
-  },
+  }
 )
 
 function onInputEnter() {
@@ -88,22 +88,36 @@ async function onOk() {
 </script>
 
 <template>
-  <div class="ws-modal" :class="{ open: open }">
+  <div
+    class="ws-modal"
+    :class="{ open: open }"
+  >
     <div class="ws-modal-box">
       <h3>选择工作空间目录</h3>
       <div class="ws-drive-row">
         <label>盘符</label>
-        <select class="ws-drive" v-model="selectedDrive">
-          <option v-for="d in wsDrives" :key="d" :value="d">{{ d }}</option>
+        <select
+          v-model="selectedDrive"
+          class="ws-drive"
+        >
+          <option
+            v-for="d in wsDrives"
+            :key="d"
+            :value="d"
+          >
+            {{ d }}
+          </option>
         </select>
       </div>
       <input
-        class="ws-input"
         v-model="currentPath"
+        class="ws-input"
         placeholder="输入或选择目标目录路径"
         @keydown.enter="onInputEnter"
-      />
-      <div class="ws-breadcrumb">{{ breadcrumb }}</div>
+      >
+      <div class="ws-breadcrumb">
+        {{ breadcrumb }}
+      </div>
       <div class="ws-browse-list">
         <div
           v-if="parentPath"
@@ -128,8 +142,15 @@ async function onOk() {
         </div>
       </div>
       <div class="ws-actions">
-        <button @click="$emit('close')">取消</button>
-        <button class="primary" @click="onOk">确定</button>
+        <button @click="$emit('close')">
+          取消
+        </button>
+        <button
+          class="primary"
+          @click="onOk"
+        >
+          确定
+        </button>
       </div>
     </div>
   </div>

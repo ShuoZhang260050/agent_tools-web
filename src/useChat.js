@@ -10,7 +10,9 @@ export function useChat() {
     return { assistantIdx: null, assistantRaw: '', toolCardIdxs: {} }
   }
 
-  function clearMessages() { items.value = [] }
+  function clearMessages() {
+    items.value = []
+  }
 
   function addMessage(role, content, opts = {}) {
     const item = { type: 'message', role, content, ...opts }
@@ -34,7 +36,8 @@ export function useChat() {
         type: 'tool_card',
         toolCall: { name: ev.name, args: ev.args, id: ev.id, permission: ev.permission },
         status: ev.permission === 'request_approval' ? 'pending' : 'running',
-        result: null, approval: null,
+        result: null,
+        approval: null,
       })
       if (ev.id) state.toolCardIdxs[ev.id] = items.value.length - 1
     } else if (ev.type === 'tool_result') {
@@ -51,8 +54,10 @@ export function useChat() {
       const idx = state.toolCardIdxs[ev.tool_call_id]
       if (idx !== undefined) {
         items.value[idx].approval = {
-          tool: ev.tool, args: ev.args,
-          tool_call_id: ev.tool_call_id, interrupt_id: ev.interrupt_id,
+          tool: ev.tool,
+          args: ev.args,
+          tool_call_id: ev.tool_call_id,
+          interrupt_id: ev.interrupt_id,
         }
       }
     } else if (ev.type === 'error') {
@@ -74,7 +79,9 @@ export function useChat() {
         store.sending = false
       }
       if (state.assistantIdx === null) addMessage('assistant', '\uff08\u65e0\u5185\u5bb9\u8fd4\u56de\uff09')
-      Object.values(state.toolCardIdxs).forEach((idx) => { items.value[idx].hidden = true })
+      Object.values(state.toolCardIdxs).forEach((idx) => {
+        items.value[idx].hidden = true
+      })
     }
   }
 
@@ -92,7 +99,11 @@ export function useChat() {
         const line = part.split('\n').find((l) => l.startsWith('data: '))
         if (!line) continue
         let ev
-        try { ev = JSON.parse(line.slice(6)) } catch { continue }
+        try {
+          ev = JSON.parse(line.slice(6))
+        } catch {
+          continue
+        }
         handleEvent(ev, state)
       }
     }
@@ -108,7 +119,10 @@ export function useChat() {
     try {
       const resp = await api.chat(body, store.currentAbort.signal)
       if (!resp.ok) {
-        if (resp.status === 401) { logout(); throw new Error('登录已过期，请重新登录') }
+        if (resp.status === 401) {
+          logout()
+          throw new Error('登录已过期，请重新登录')
+        }
         throw new Error('HTTP ' + resp.status)
       }
       await readStream(resp, state)
@@ -131,10 +145,13 @@ export function useChat() {
     try {
       const resp = await api.resume(
         { thread_id: store.currentTid, decision, permission: store.currentPermission },
-        store.currentAbort.signal,
+        store.currentAbort.signal
       )
       if (!resp.ok) {
-        if (resp.status === 401) { logout(); throw new Error('登录已过期，请重新登录') }
+        if (resp.status === 401) {
+          logout()
+          throw new Error('登录已过期，请重新登录')
+        }
         throw new Error('HTTP ' + resp.status)
       }
       await readStream(resp, state)
@@ -147,7 +164,9 @@ export function useChat() {
     }
   }
 
-  function abort() { if (store.currentAbort) store.currentAbort.abort() }
+  function abort() {
+    if (store.currentAbort) store.currentAbort.abort()
+  }
 
-  return { items, typing, sendMessage, resumeChat, clearMessages, addMessage, abort }
+  return { items, typing, sendMessage, resumeChat, clearMessages, addMessage, abort, handleEvent, makeStreamState }
 }

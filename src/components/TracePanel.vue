@@ -13,7 +13,7 @@ async function load() {
   try {
     const data = await api.getTraces(props.threadId)
     traces.value = data.traces || []
-  } catch (e) {
+  } catch {
     traces.value = []
   }
 }
@@ -23,7 +23,7 @@ watch(
   ([vis]) => {
     if (vis) load()
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 function fmtTime(ts) {
@@ -36,7 +36,10 @@ function fmtTokens(t) {
 </script>
 
 <template>
-  <div class="trace-panel" :style="{ display: visible ? 'block' : 'none' }">
+  <div
+    class="trace-panel"
+    :style="{ display: visible ? 'block' : 'none' }"
+  >
     <table>
       <thead>
         <tr>
@@ -49,9 +52,18 @@ function fmtTokens(t) {
       </thead>
       <tbody>
         <tr v-if="traces.length === 0">
-          <td colspan="5" class="trace-empty">暂无追踪记录</td>
+          <td
+            colspan="5"
+            class="trace-empty"
+          >
+            暂无追踪记录
+          </td>
         </tr>
-        <tr v-for="(t, i) in traces" :key="i" :class="t.type">
+        <tr
+          v-for="(t, i) in traces"
+          :key="i"
+          :class="t.type"
+        >
           <td>{{ fmtTime(t.timestamp) }}</td>
           <td>{{ t.type }}</td>
           <td>{{ t.name || '' }}</td>
