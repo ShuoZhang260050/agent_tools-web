@@ -29,7 +29,7 @@ function onDeny() { emit("deny", props.toolCall.id) }
 <template>
   <div class="tool-card" :class="{ collapsed }">
     <div class="tc-head" @click="collapsed = !collapsed">
-      🔧 {{ toolCall.name }}
+      {{ toolCall.name }}
       <span v-if="toolCall.permission === 'auto_approve'" class="tc-badge auto">自动审批</span>
       <span :class="statusClass">{{ statusText }}</span>
       <span class="tc-toggle">{{ collapsed ? "▸ 详情" : "▾ 收起" }}</span>
@@ -41,7 +41,7 @@ function onDeny() { emit("deny", props.toolCall.id) }
     </div>
     <div v-if="hasClamp && !shotMatch" class="tc-expand" @click.stop="expanded = !expanded">{{ expanded ? "收起" : "展开" }}</div>
     <div v-if="approval" class="tc-approval">
-      <div class="tc-approval-desc" v-html="'📝 ' + descHtml"></div>
+      <div class="tc-approval-desc" v-html="descHtml"></div>
       <span class="tc-approval-msg">此操作需要您确认：</span>
       <button class="tc-approve" @click.stop="onApprove">确认执行</button>
       <button class="tc-deny" @click.stop="onDeny">取消</button>

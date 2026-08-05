@@ -110,7 +110,7 @@ async function onOk() {
           class="ws-dir-item ws-dir-up"
           @click="browse(parentPath)"
         >
-          <span>📁</span> ..
+          <span>^</span> ..
         </div>
         <div
           v-for="d in browseList"
@@ -118,7 +118,7 @@ async function onOk() {
           class="ws-dir-item"
           @click="browse(d.path)"
         >
-          <span>📁</span> {{ d.name }}
+          <span>></span> {{ d.name }}
         </div>
         <div
           v-if="browseList.length === 0 && !parentPath"

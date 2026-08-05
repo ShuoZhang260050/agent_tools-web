@@ -51,10 +51,10 @@ function finishRename(save) {
     </div>
     <div class="sidebar-footer">
       <button class="ws-btn" @click="emit('open-workspace')" :title="workspace">
-        {{ workspace ? "📁 " + workspace.split(/[\\\/]/).pop() : "📁 工作空间" }}
+        {{ workspace ? workspace.split(/[\\\/]/).pop() : "工作空间" }}
       </button>
       <button class="trace-btn" :class="{ active: traceVisible }" @click="emit('toggle-trace')">
-        {{ traceVisible ? "🔍 调试 ON" : "🔍 调试" }}
+        {{ traceVisible ? "调试 ON" : "调试" }}
       </button>
     </div>
   </div>
