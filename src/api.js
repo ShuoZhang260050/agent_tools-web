@@ -63,6 +63,10 @@ export const api = {
     return request('/me')
   },
 
+  async getPermissions() {
+    return request('/permissions')
+  },
+
   async getSessions() {
     return request('/sessions')
   },

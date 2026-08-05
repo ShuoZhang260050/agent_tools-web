@@ -99,6 +99,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .tool-card .tc-approval .tc-approve:hover { opacity: 0.9; }
 .tool-card .tc-approval .tc-deny { background: var(--panel); color: var(--text); }
 .tool-card .tc-approval .tc-deny:hover { border-color: #dc2626; color: #dc2626; }
+.tool-card .tc-approval .tc-approval-note { width: 100%; font-size: 11px; color: var(--muted); }
 .tool-card .tc-badge { font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-left: 4px; font-weight: 600; }
 .tool-card .tc-badge.auto { background: #fef3c7; color: #92400e; }
 .tool-card .tc-args { margin-top: 6px; color: #4b5563; }
@@ -211,8 +212,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .messages::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 .header { box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 5; }
 
-/* scrollbar */
-.messages::-webkit-scrollbar, .session-list::-webkit-scrollbar, .sync-files::-webkit-scrollbar, .ws-browse-list::-webkit-scrollbar, .trace-panel::-webkit-scrollbar { width: 6px; }
-.messages::-webkit-scrollbar-track, .session-list::-webkit-scrollbar-track { background: transparent; }
-.messages::-webkit-scrollbar-thumb, .session-list::-webkit-scrollbar-thumb, .sync-files::-webkit-scrollbar-thumb, .ws-browse-list::-webkit-scrollbar-thumb, .trace-panel::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-.messages::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+/* toast */
+.toast {
+  position: fixed; top: 16px; right: 16px; z-index: 9999;
+  padding: 10px 20px; border-radius: 8px; font-size: 14px; color: #fff;
+  cursor: pointer; max-width: 360px;
+  background: #dc2626; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.toast.info { background: #2563eb; }
+.toast-enter-active, .toast-leave-active { transition: all 0.25s ease; }
+.toast-enter-from, .toast-leave-to { transform: translateX(100%); opacity: 0; }

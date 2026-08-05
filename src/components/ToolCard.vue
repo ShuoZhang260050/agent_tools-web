@@ -45,6 +45,7 @@ function onDeny() { emit("deny", props.toolCall.id) }
       <span class="tc-approval-msg">此操作需要您确认：</span>
       <button class="tc-approve" @click.stop="onApprove">确认执行</button>
       <button class="tc-deny" @click.stop="onDeny">取消</button>
+      <div class="tc-approval-note">所有待审批操作将统一执行或取消</div>
     </div>
   </div>
 </template>

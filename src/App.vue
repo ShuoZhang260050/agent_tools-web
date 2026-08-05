@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { ref, onMounted, watch } from "vue"
 import { api } from "./api.js"
-import { store, setAuthed, logout, setPermission, setModel } from "./store.js"
+import { store, setAuthed, logout, setPermission, setModel, PERMISSION_CHOICES, showToast } from "./store.js"
 import { useChat } from "./useChat.js"
 import AuthView from "./components/AuthView.vue"
 import Sidebar from "./components/Sidebar.vue"
@@ -24,6 +24,7 @@ function onAuthed(token, username) {
   setAuthed(true)
   newSession()
   loadModels()
+  loadPermissions()
   loadSessions()
   loadDocuments()
   loadWorkspace()
@@ -41,6 +42,7 @@ async function checkAuth() {
     store.currentUser = localStorage.getItem("agent_user") || ""
     newSession()
     loadModels()
+    loadPermissions()
     loadSessions()
     loadDocuments()
     loadWorkspace()
@@ -57,28 +59,36 @@ async function loadModels() {
     if (!store.currentModel || !names.includes(store.currentModel)) {
       if (names.length) setModel(names[0])
     }
-  } catch (e) { console.error(e) }
+  } catch (e) { showToast(e.message || '操作失败') }
+}
+
+async function loadPermissions() {
+  try {
+    const data = await api.getPermissions()
+    const localMap = Object.fromEntries(PERMISSION_CHOICES.map((p) => [p.value, p]))
+    store.permissionChoices = (data.choices || []).map((c) => ({ ...(localMap[c.value] || {}), ...c }))
+  } catch (e) { showToast(e.message || '操作失败') }
 }
 
 async function loadSessions() {
   try {
     const data = await api.getSessions()
     sessions.value = data.sessions || []
-  } catch (e) { console.error(e) }
+  } catch (e) { showToast(e.message || '操作失败') }
 }
 
 async function loadDocuments() {
   try {
     const data = await api.getDocuments()
     documents.value = data.documents || []
-  } catch (e) { console.error(e) }
+  } catch (e) { showToast(e.message || '操作失败') }
 }
 
 async function loadWorkspace() {
   try {
     const data = await api.getWorkspace()
     store.workspace = data.workspace || ""
-  } catch (e) { console.error("Failed to load workspace:", e) }
+  } catch (e) { showToast(e.message || "加载工作空间失败") }
 }
 
 function newSession() {
@@ -114,17 +124,17 @@ async function deleteSession(tid) {
     await api.deleteSession(tid)
     if (store.currentTid === tid) newSession()
     loadSessions()
-  } catch (e) { console.error(e) }
+  } catch (e) { showToast(e.message || '操作失败') }
 }
 
 async function renameSession(tid, title) {
-  try { await api.renameSession(tid, title) } catch (e) { console.error(e) }
+  try { await api.renameSession(tid, title) } catch (e) { showToast(e.message || '操作失败') }
   loadSessions()
 }
 
 async function deleteDocument(docId) {
   if (!confirm("\u786e\u5b9a\u5220\u9664\u6587\u6863\uff1f")) return
-  try { await api.deleteDocument(docId); loadDocuments() } catch (e) { console.error(e) }
+  try { await api.deleteDocument(docId); loadDocuments() } catch (e) { showToast(e.message || '操作失败') }
 }
 
 function onSend(body) {
@@ -219,5 +229,10 @@ onMounted(() => { checkAuth() })
       </div>
     </div>
     <WorkspaceModal :open="wsModalOpen" @close="wsModalOpen = false" @saved="onWorkspaceSaved" />
+    <Transition name="toast">
+      <div v-if="store.toast.visible" class="toast" :class="store.toast.type" @click="store.toast.visible = false">
+        {{ store.toast.message }}
+      </div>
+    </Transition>
   </template>
 </template>

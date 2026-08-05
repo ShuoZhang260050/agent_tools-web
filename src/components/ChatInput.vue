@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue"
 import { api } from "../api.js"
 import { modelShortName } from "../utils.js"
-import { PERMISSION_CHOICES } from "../store.js"
+import { store, PERMISSION_CHOICES } from "../store.js"
 
 const props = defineProps({
   sending: { type: Boolean, default: false },
@@ -27,7 +27,7 @@ const fileInput = ref(null)
 const ragInput = ref(null)
 
 const sendDisabled = computed(() => props.approvalPending || props.syncPending)
-const currentPerm = computed(() => PERMISSION_CHOICES.find((p) => p.value === props.currentPermission) || PERMISSION_CHOICES[0])
+const currentPerm = computed(() => store.permissionChoices.find((p) => p.value === props.currentPermission) || PERMISSION_CHOICES[0])
 
 function onKeydown(e) {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doSend() }
@@ -168,7 +168,7 @@ onUnmounted(() => document.removeEventListener("click", onDocClick))
           <span class="perm-caret">▾</span>
         </button>
         <div class="permission-menu">
-          <div v-for="p in PERMISSION_CHOICES" :key="p.value" class="permission-option"
+          <div v-for="p in store.permissionChoices" :key="p.value" class="permission-option"
                :class="{ active: p.value === currentPermission }" @click="permOpen = false; emit('select-permission', p.value)">
             <span class="perm-dot" :style="{ background: p.color }"></span>
             <div class="perm-text">

@@ -17,18 +17,11 @@ export const store = reactive({
   authToken: localStorage.getItem('agent_token') || '',
   currentUser: localStorage.getItem('agent_user') || '',
   workspace: '',
-  sessions: [],
-  documents: [],
-  messages: [],
-  toolCards: {},
+  permissionChoices: [...PERMISSION_CHOICES],
   traceVisible: false,
-  traces: [],
-  currentImage: null,
-  currentFileText: null,
-  currentFileName: null,
-  currentFileSize: null,
   currentAbort: null,
   authed: false,
+  toast: { message: '', type: 'error', visible: false },
 })
 
 export function setAuthed(v) {
@@ -56,4 +49,11 @@ export function setPermission(value) {
 export function setModel(value) {
   store.currentModel = value
   localStorage.setItem('agent_model', value)
+}
+
+let toastTimer = null
+export function showToast(message, type = 'error') {
+  store.toast = { message, type, visible: true }
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => { store.toast.visible = false }, 4000)
 }
