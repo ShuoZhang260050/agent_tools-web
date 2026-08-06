@@ -144,12 +144,13 @@ export const api = {
     )
   },
 
-  async syncShadow(tid, verifyCommand) {
+  async syncShadow(tid, verifyCommand, files = null) {
     const params =
       'thread_id=' +
       encodeURIComponent(tid) +
       (verifyCommand ? '&verify_command=' + encodeURIComponent(verifyCommand) : '')
-    return request('/workspace/sync?' + params, { method: 'POST' })
+    const body = files ? JSON.stringify({ files }) : undefined
+    return request('/workspace/sync?' + params, { method: 'POST', body })
   },
 
   async revertShadow(tid) {

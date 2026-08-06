@@ -18,6 +18,30 @@ const busy = ref(false)
 const added = computed(() => props.diff.added || [])
 const modified = computed(() => props.diff.modified || [])
 const deleted = computed(() => props.diff.deleted || [])
+
+const allFiles = computed(() => [
+  ...added.value.map((f) => ({ rel: f, type: 'added' })),
+  ...modified.value.map((f) => ({ rel: f, type: 'modified' })),
+  ...deleted.value.map((f) => ({ rel: f, type: 'deleted' })),
+])
+const selected = ref(new Set())
+const selectedSyncDisabled = computed(() => selected.value.size === 0)
+
+function toggleFile(rel) {
+  const next = new Set(selected.value)
+  if (next.has(rel)) next.delete(rel)
+  else next.add(rel)
+  selected.value = next
+}
+
+function selectAll() {
+  selected.value = new Set(allFiles.value.map((f) => f.rel))
+}
+
+function deselectAll() {
+  selected.value = new Set()
+}
+
 const msgClass = computed(() => (syncMsg.value.startsWith('✓') ? 'sync-msg sync-ok' : 'sync-msg sync-err'))
 
 async function onVerify() {
@@ -42,7 +66,8 @@ async function onSync() {
   busy.value = true
   syncMsg.value = ''
   try {
-    await api.syncShadow(props.tid, verifyCmd.value)
+    const files = selected.value.size > 0 ? [...selected.value] : null
+    await api.syncShadow(props.tid, verifyCmd.value, files)
     syncMsg.value = '✓ 已同步到工作区'
     emit('synced', props.tid)
   } catch (e) {
@@ -79,32 +104,38 @@ async function onRevert() {
       <span class="sync-tag sync-deleted">删除 {{ deleted.length }}</span>
     </div>
     <div class="sync-files">
-      <div
-        v-for="f in added"
-        :key="'a' + f"
-        class="sync-file"
-      >
-        <span class="sf-icon">+</span>
-        <span class="sf-name">{{ f }}</span>
+      <div class="sync-files-toolbar">
+        <button
+          class="sync-select-btn"
+          @click="selectAll"
+        >
+          全选
+        </button>
+        <button
+          class="sync-select-btn"
+          @click="deselectAll"
+        >
+          取消全选
+        </button>
+        <span class="sync-selected-count">已选 {{ selected.size }}/{{ allFiles.length }}</span>
       </div>
       <div
-        v-for="f in modified"
-        :key="'m' + f"
+        v-for="f in allFiles"
+        :key="f.rel"
         class="sync-file"
+        :class="f.type"
+        @click="toggleFile(f.rel)"
       >
-        <span class="sf-icon">~</span>
-        <span class="sf-name">{{ f }}</span>
+        <input
+          type="checkbox"
+          :checked="selected.has(f.rel)"
+          @click.stop="toggleFile(f.rel)"
+        >
+        <span class="sf-icon">{{ f.type === 'added' ? '+' : f.type === 'modified' ? '~' : '-' }}</span>
+        <span class="sf-name">{{ f.rel }}</span>
       </div>
       <div
-        v-for="f in deleted"
-        :key="'d' + f"
-        class="sync-file"
-      >
-        <span class="sf-icon">-</span>
-        <span class="sf-name">{{ f }}</span>
-      </div>
-      <div
-        v-if="added.length + modified.length + deleted.length === 0"
+        v-if="allFiles.length === 0"
         class="sync-file"
       >
         <span
@@ -143,7 +174,7 @@ async function onRevert() {
     <div class="sync-actions">
       <button
         class="sync-btn sync-apply"
-        :disabled="busy || verified === false"
+        :disabled="busy || verified === false || selectedSyncDisabled"
         @click="onSync()"
       >
         同步到工作区
