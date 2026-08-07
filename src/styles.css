@@ -592,62 +592,26 @@ body {
 }
 .tool-card .tc-approval {
   margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
 }
 .tool-card .tc-approval-desc {
-  width: 100%;
   padding: 6px 10px;
-  background: var(--warning-bg);
-  border: 1px solid var(--warning-border);
+  background: var(--hover-bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--danger-soft);
   border-radius: 8px;
   font-size: 12px;
-  color: var(--warning-text);
+  color: var(--text);
   word-break: break-word;
 }
 .tool-card .tc-approval-desc code {
-  background: var(--warning-code-bg);
+  background: var(--code-inline-bg);
   padding: 1px 5px;
   border-radius: 4px;
   font-size: 12px;
 }
 .tool-card .tc-approval-desc b {
-  color: var(--warning-text-strong);
-}
-.tool-card .tc-approval .tc-approval-msg {
-  font-size: 12px;
-  color: var(--warning-text-strong);
-}
-.tool-card .tc-approval button {
-  padding: 5px 14px;
-  border-radius: 8px;
-  font: inherit;
-  font-size: 12px;
-  cursor: pointer;
-  border: 1px solid var(--border);
-}
-.tool-card .tc-approval .tc-approve {
-  background: var(--accent);
-  color: var(--btn-fg);
-  border: none;
-}
-.tool-card .tc-approval .tc-approve:hover {
-  opacity: 0.9;
-}
-.tool-card .tc-approval .tc-deny {
-  background: var(--panel);
   color: var(--text);
-}
-.tool-card .tc-approval .tc-deny:hover {
-  border-color: var(--danger);
-  color: var(--danger);
-}
-.tool-card .tc-approval .tc-approval-note {
-  width: 100%;
-  font-size: 11px;
-  color: var(--muted);
+  font-weight: 600;
 }
 .tool-card .tc-badge {
   font-size: 10px;
@@ -903,6 +867,62 @@ body {
 .sync-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.approval-bar-wrap {
+  padding: 0 48px 8px;
+}
+.approval-bar {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 10px 14px;
+  background: var(--hover-bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--danger-soft);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.approval-bar .ab-info {
+  flex: 1;
+  min-width: 0;
+}
+.approval-bar .ab-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.approval-bar .ab-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.approval-bar .ab-approve,
+.approval-bar .ab-deny {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 18px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.approval-bar .ab-approve {
+  background: var(--accent);
+  color: var(--btn-fg);
+  border: none;
+}
+.approval-bar .ab-approve:hover {
+  opacity: 0.9;
+}
+.approval-bar .ab-deny {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.approval-bar .ab-deny:hover {
+  border-color: var(--danger);
+  color: var(--danger);
 }
 .input-bar {
   padding: 12px 48px 16px;

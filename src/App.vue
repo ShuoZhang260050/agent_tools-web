@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { api } from './api.js'
 import { store, setAuthed, logout, setPermission, setModel, PERMISSION_CHOICES, showToast } from './store.js'
 import { useChat } from './useChat.js'
@@ -8,6 +8,7 @@ import Sidebar from './components/Sidebar.vue'
 import ChatHeader from './components/ChatHeader.vue'
 import MessageList from './components/MessageList.vue'
 import ChatInput from './components/ChatInput.vue'
+import ApprovalBar from './components/ApprovalBar.vue'
 import WorkspaceModal from './components/WorkspaceModal.vue'
 import TracePanel from './components/TracePanel.vue'
 
@@ -15,6 +16,10 @@ const { items, typing, sendMessage, resumeChat, clearMessages, addMessage, abort
 const wsModalOpen = ref(false)
 const sessions = ref([])
 const documents = ref([])
+
+const pendingApprovalCount = computed(
+  () => items.value.filter((i) => i.type === 'tool_card' && i.approval).length
+)
 
 function onAuthed(token, username) {
   localStorage.setItem('agent_token', token)
@@ -293,11 +298,19 @@ onMounted(() => {
         <MessageList
           :items="items"
           :typing="typing"
-          @approve="onApprove"
-          @deny="onDeny"
           @synced="onSynced"
           @reverted="onReverted"
         />
+        <div
+          v-if="store.approvalPending && pendingApprovalCount > 0"
+          class="approval-bar-wrap"
+        >
+          <ApprovalBar
+            :count="pendingApprovalCount"
+            @approve="onApprove"
+            @deny="onDeny"
+          />
+        </div>
         <ChatInput
           :sending="store.sending"
           :approval-pending="store.approvalPending"

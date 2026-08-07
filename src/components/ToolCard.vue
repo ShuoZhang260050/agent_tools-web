@@ -8,7 +8,6 @@ const props = defineProps({
   result: { type: String, default: null },
   approval: { type: Object, default: null },
 })
-const emit = defineEmits(['approve', 'deny'])
 const collapsed = ref(false)
 const expanded = ref(false)
 
@@ -21,13 +20,6 @@ const shotMatch = computed(() => {
   const m = String(props.result || '').match(SCREENSHOT_RE)
   return m ? m[0] : null
 })
-
-function onApprove() {
-  emit('approve', props.toolCall.id)
-}
-function onDeny() {
-  emit('deny', props.toolCall.id)
-}
 </script>
 
 <template>
@@ -80,22 +72,6 @@ function onDeny() {
         class="tc-approval-desc"
         v-html="descHtml"
       />
-      <span class="tc-approval-msg">此操作需要您确认：</span>
-      <button
-        class="tc-approve"
-        @click.stop="onApprove"
-      >
-        确认执行
-      </button>
-      <button
-        class="tc-deny"
-        @click.stop="onDeny"
-      >
-        取消
-      </button>
-      <div class="tc-approval-note">
-        所有待审批操作将统一执行或取消
-      </div>
     </div>
   </div>
 </template>

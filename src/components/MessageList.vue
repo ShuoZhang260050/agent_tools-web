@@ -9,7 +9,7 @@ const props = defineProps({
   typing: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['approve', 'deny', 'synced', 'reverted'])
+const emit = defineEmits(['synced', 'reverted'])
 
 const messagesEl = ref(null)
 
@@ -85,8 +85,6 @@ defineExpose({ scrollBottom })
         :status="item.status"
         :result="item.result"
         :approval="item.approval"
-        @approve="(id) => emit('approve', id)"
-        @deny="(id) => emit('deny', id)"
       />
 
       <!-- Sync panel -->
